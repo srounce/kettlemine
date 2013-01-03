@@ -9,5 +9,5 @@ var route = {
 };
  
 exports.init = function(server) {
-  server.all(prefix+'/', route.somepage.get);
+  server.all(routePrefix+'/', route.index.all);
 };
