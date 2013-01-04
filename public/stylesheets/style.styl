@@ -25,10 +25,19 @@ body
   color #666
 for $level in 1..6
   h{$level}
-    $size = 50% * (6 - $level)
-    font-size $size
-    line-height 1em
-    font-family "FuturaStdBoldOblique", sans-serif
+    $size = (50% * (6 - $level)) * 1em
+    margin-top .5em
+    margin-bottom .5em
+    if $level > 1
+      font-family "FuturaStdBoldOblique", sans-serif
+      font-size $size
+      line-height 1em
+    else
+      font-size $size * 2
+      font-weight bolder
+      line-height .25em
+      letter-spacing -0.05em
+  
 a
   color #00B7FF
 button
@@ -55,22 +64,18 @@ button
   border-right 0
   border-bottom 0
   border-left 0
-  &:before, &:after 
+  &:before
     z-index -2
-    box-shadow 0 .75em 1em rgba(0,0,0,0.4)
-    border-radius 1em
-    display block
-    height 20%
-    width 50%
+    box-shadow 0 .75em 1em rgba(0,0,0,0.3)
+    border-radius 100px / 10px
     background transparent
     position absolute
-    left 10px
-    bottom 15px
+    $shadowPad = 5px
+    left $shadowPad
+    right $shadowPad
+    top 0
+    bottom 25%
     content ""
-    transform rotate($shadowAngle)
-  &:before
-    transform rotate($shadowAngle * -1)
-  &:after
-    right 10px
-    left auto
+    //transform rotate($shadowAngle)
+
 

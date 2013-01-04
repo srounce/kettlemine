@@ -6,8 +6,8 @@ block content
     h2 #{teaCounter} cups in the brew queue
     p It appears that you 
       unless wantsTea
-        | don't 
+        b don't 
       | want a cup of tea.
       form(action="/choose", method="POST")
         input(type="hidden", name="wantsTea", value="#{!wantsTea}")
-        button(type="submit").shadow I've changed my mind!
+        button(type="submit").shadow I changed my mind!
