@@ -1,12 +1,47 @@
 (function() {
-  var evt_form_submit
+  var xhr
+    , evt_form_submit
+    , updateCupCount
+    , initCountPolling
     , init
     , serializeForm
     , evt_form_submit
-    , evt_formXhr_stateChange
     , evt_form_submit
     , tmpl_formSave
     , browserijade = require('browserijade');
+
+  xhr = function(url, method, data, success, error) 
+  {
+    successFunc = success || function(){};
+    errorFunc = error || function(){};
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function( ev )
+    {
+      switch( this.readyState ) {
+        case 3 :
+          errorFunc.call(this);
+          break;
+        case 4 :
+          switch( this.status ) {
+            case 200 :
+              successFunc.call(this, this.response);
+              break;
+            default :
+              break;
+          }
+          try {
+            document.querySelector('form').attributes.removeNamedItem('disabled');
+          } catch(e) { }
+          break;
+        default :
+          break;
+      }
+    };
+    xhr.timeout = 3000;
+    xhr.open(method, url);
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    xhr.send();
+  };
 
   evt_form_submit = function( ev )
   {
@@ -18,59 +53,52 @@
 
     ev.preventDefault();
 
-    form.setAttribute('disabled', true);
-
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = evt_formXhr_stateChange;
-    xhr.timeout = 10000;
-    xhr.open(form.method, form.action);
-    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-    try {
-      xhr.responseType = "json";
-    } catch(e) {}
-    xhr.send();
+    form.setAttribute('disabled', '');
+    xhr(form.action, form.method, null, evt_formXhr_complete);
   };
 
-  evt_formXhr_stateChange = function( ev )
-  {
-    switch( this.readyState ) {
-      case 4 :
-        switch( this.status ) {
-          case 200 :
-            evt_formXhr_complete.apply(this);
-            break;
-          default :
-            break;
-        }
-        document.querySelector('form').attributes.removeNamedItem('disabled');
-        break;
-      default :
-        break;
-    }
-  };
 
-  evt_formXhr_complete = function( )
+  evt_formXhr_complete = function( data )
   {
     var data = typeof this.response === "object" ? this.response : JSON.parse(this.response);
     var statusText = browserijade('partials/statusText', { wantsTea : data.wantsTea });
-    var el_cupCount = document.querySelector('.cupCount');
     
     document.querySelector('.statusText').innerHTML = statusText;
-    el_cupCount.classList.add('countOut');
+    var el_cupCount = document.querySelector('.cupCount');
+    updateCupCount(el_cupCount, data.count);
+  };
+
+  updateCupCount = function( element, value )
+  {
+    element.classList.add('countOut');
     setTimeout(function() {
-      el_cupCount.textContent = data.count;
-      el_cupCount.classList.add('countIn');
-      el_cupCount.classList.remove('countOut');
+      element.textContent = parseInt(value);
+      element.classList.add('countIn');
+      element.classList.remove('countOut');
       
       setTimeout(function() {
-        el_cupCount.classList.remove('countIn');
+        element.classList.remove('countIn');
       }, 200);
     }, 200);
+  }
+
+  initCountPolling = function()
+  {
+    var form = document.querySelector('form');
+    xhr('/arduino/count', 'GET', null, function( data ) {
+      
+      var el_cupCount = document.querySelector('.cupCount');
+      if( parseInt(el_cupCount.textContent, 10) !== parseInt(data, 10) ) {
+        updateCupCount(el_cupCount, data);
+      }
+      setTimeout(initCountPolling, 3000);
+    });
   };
 
   init = function()
   {
     document.querySelector('form').addEventListener('submit', evt_form_submit, false);
+    setTimeout(initCountPolling, 3000);
   };
 
   if (window.addEventListener) {

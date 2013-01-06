@@ -16,8 +16,6 @@ var routes = {
   },
   choose : {
     post : function( req, res ) {
-      console.log( req.xhr );
-
       var wantsTea = ( req.session.wantsTea || false)
         , teaCounter = res.app.locals.teaCounter;
 
