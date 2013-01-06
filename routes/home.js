@@ -16,22 +16,28 @@ var routes = {
   },
   choose : {
     post : function( req, res ) {
-      var wantsTea
+      console.log( req.xhr );
+
+      var wantsTea = ( req.session.wantsTea || false)
         , teaCounter = res.app.locals.teaCounter;
 
-      if(typeof req.body.wantsTea !== "undefined") {
-        wantsTea = ( (req.body.wantsTea === "true") || false);
+      if( wantsTea ) {
+        teaCounter.down();
+      } else {
+        teaCounter.up();
+      }
 
-        if(wantsTea) {
-          teaCounter.up();
-        } else {
-          teaCounter.down();
-        }
+      wantsTea = req.session.wantsTea = !wantsTea;
 
-        req.session.wantsTea = wantsTea;
-      }  
-
-      res.redirect(301, "/");
+      if( req.xhr ) {
+        res.send({
+          success : true,
+          count : Number(teaCounter),
+          wantsTea : wantsTea
+        });
+      } else {
+        res.redirect(301, "/");
+      }
     }
   }  
 };

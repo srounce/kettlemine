@@ -1,7 +1,8 @@
 doctype 5
 html
   head
-    title= title
+    title= settings.title
     link(rel='stylesheet', href='/stylesheets/style.css')
-  body
+    script(src="/browserify.js", type="text/javascript")
+  body.shadow
     block content

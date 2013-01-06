@@ -13,6 +13,13 @@ var routes = {
     },
     del : function( req, res ) {
       var teaCounter = res.app.locals.teaCounter;
+      var sessionStore = res.app.get('sessionStore');
+      Object.keys(sessionStore.sessions).forEach(function( sid ) {
+        var session = JSON.parse(sessionStore.sessions[sid]);
+        console.log(session);
+        session.wantsTea = false;
+        sessionStore.sessions[sid] = JSON.stringify(session);
+      }.bind(this));
       res.send( String(teaCounter.reset() ? 1 : 0) );
     }
   }

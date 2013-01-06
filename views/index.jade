@@ -2,12 +2,13 @@ extends layout
 
 block content
   div#content
-    h1= title
-    h2 #{teaCounter} cups in the brew queue
-    p It appears that you 
-      unless wantsTea
-        b don't 
-      | want a cup of tea.
+    h1= settings.title
+    h2 
+      span.cupCount #{teaCounter}
+      |  cups in the brew queue
+    p It appears that 
+      span.statusText
+        include partials/statusText
+      |  a cup of tea.
       form(action="/choose", method="POST")
-        input(type="hidden", name="wantsTea", value="#{!wantsTea}")
-        button(type="submit").shadow I changed my mind!
+        button(type="submit", value="default").shadow I changed my mind!
