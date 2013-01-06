@@ -18,7 +18,8 @@ var routes = {
       var sessionStore = res.app.get('sessionStore');
       var smtpTransport = nodemailer.createTransport("SMTP", config.email);
 
-      Object.keys(sessionStore.sessions).forEach(function( sid ) {
+      var sids = Object.keys(sessionStore.sessions);
+      sids.forEach(function( sid ) {
         var session = JSON.parse(sessionStore.sessions[sid]);
         
         if( session.wantsTea && session.email && session.email !== false ) {
@@ -38,6 +39,10 @@ var routes = {
 
         session.wantsTea = false;
         sessionStore.sessions[sid] = JSON.stringify(session);
+
+        if( sid === sids[ sids.length -1 ] ) {
+          smtpTransport.close();
+        }
       }.bind(this));
       res.send( String(teaCounter.reset() ? 1 : 0) );
     }
