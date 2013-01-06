@@ -1,5 +1,7 @@
-var routePrefix = "/arduino";
+var nodemailer = require('nodemailer')
+  , config = require('../config.js');
 
+var routePrefix = "/arduino";
 var routes = {
   index : {
     all : function( req, res ) {
@@ -14,9 +16,26 @@ var routes = {
     del : function( req, res ) {
       var teaCounter = res.app.locals.teaCounter;
       var sessionStore = res.app.get('sessionStore');
+      var smtpTransport = nodemailer.createTransport("SMTP", config.email);
+
       Object.keys(sessionStore.sessions).forEach(function( sid ) {
         var session = JSON.parse(sessionStore.sessions[sid]);
-        console.log(session);
+        
+        if( session.wantsTea && session.email && session.email !== false ) {
+          smtpTransport.sendMail({
+            from : config.strings.title + ' <' + config.email.auth.user + '>',
+            to : session.email,
+            subject : "Tea's ready!",
+            text : "Plaintext message goes here",
+            html : "<b>HTML</b> message <em>goes</em> here!"
+          }, function( err, res ) {
+            if( err ) 
+              console.error(err)
+            else
+              console.info(res);
+          });
+        }
+
         session.wantsTea = false;
         sessionStore.sessions[sid] = JSON.stringify(session);
       }.bind(this));
