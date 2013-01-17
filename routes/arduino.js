@@ -8,6 +8,27 @@ var routes = {
       res.send('Hello arduino!');
     }
   }, 
+  ready : {
+    all : function( req, res ) {
+      var smtpTransport = nodemailer.createTransport("SMTP", config.email);
+
+      smtpTransport.sendMail({
+        from : config.strings.title + ' <' + config.email.auth.user + '>',
+        to : config.strings.email.to,
+        subject : config.strings.email.subject,
+        text : config.strings.email.plaintext,
+        html : config.strings.email.html
+      }, function( err, mState ) {
+        if( err ) {
+          console.error(err)
+          res.send(0);
+        } else {
+          console.info(mState);
+          res.send(1);
+        }
+      });
+    },
+  },
   count : {
     all : function( req, res ) {
       var teaCounter = res.app.locals.teaCounter;
@@ -52,6 +73,8 @@ var routes = {
 exports.init = function( server ) 
 {
   server.all(routePrefix, routes.index.all);
+  
+  server.all(routePrefix+"/ready", routes.ready.all);
   
   server.del(routePrefix+"/count", routes.count.del);
   server.all(routePrefix+"/count", routes.count.all);

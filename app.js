@@ -65,5 +65,5 @@ util.print('Done!\n');
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log( '---------------------------------'.bold );
-  console.log( ("KettleMine listening on port " + app.get('port')).green );
+  console.log( (config.strings.title + " listening on port " + app.get('port')).green );
 });
