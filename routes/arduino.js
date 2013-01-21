@@ -42,8 +42,10 @@ var routes = {
       var smtpTransport = nodemailer.createTransport("SMTP", config.email);
 
       var sids = Object.keys(sessionStore.sessions);
+console.log(sids.length);      
       sids.forEach(function( sid ) {
         var session = JSON.parse(sessionStore.sessions[sid]);
+console.log(sids);
         
         if( session.wantsTea && session.email && session.email !== false ) {
           smtpTransport.sendMail({

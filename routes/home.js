@@ -5,9 +5,8 @@ var routePrefix = "/";
 var routes = {
   index : {
     all : function( req, res ) {
-      var teaCounter = 0;
-
-      var wantsTea = req.session.wantsTea = (req.session.wantsTea || 0);
+      var teaCounter = 0
+        , wantsTea = req.session.wantsTea = (req.session.wantsTea || 0);
 
       res.render('index', {
         routePrefix : routePrefix,

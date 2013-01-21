@@ -73,6 +73,13 @@
     element.classList.add('countOut');
     setTimeout(function() {
       element.textContent = parseInt(value);
+      
+      if(parseInt(value) === 0) {
+        var statusText = browserijade('partials/statusText', { wantsTea : false });
+        
+        document.querySelector('.statusText').innerHTML = statusText;
+      }
+
       element.classList.add('countIn');
       element.classList.remove('countOut');
       
