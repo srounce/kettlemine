@@ -40,7 +40,7 @@
     xhr.timeout = 3000;
     xhr.open(method, url);
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-    xhr.send();
+    xhr.send(data);
   };
 
   evt_form_submit = function( ev )
@@ -54,7 +54,7 @@
     ev.preventDefault();
 
     form.setAttribute('disabled', '');
-    xhr(form.action, form.method, null, evt_formXhr_complete);
+    xhr(form.action, form.method, new FormData(form), evt_formXhr_complete);
   };
 
 
@@ -84,21 +84,20 @@
 
   initCountPolling = function()
   {
-    var form = document.querySelector('form');
     xhr('/arduino/count', 'GET', null, function( data ) {
       
       var el_cupCount = document.querySelector('.cupCount');
       if( parseInt(el_cupCount.textContent, 10) !== parseInt(data, 10) ) {
         updateCupCount(el_cupCount, data);
       }
-      setTimeout(initCountPolling, 3000);
+      setTimeout(initCountPolling, 5000);
     });
   };
 
   init = function()
   {
     document.querySelector('form').addEventListener('submit', evt_form_submit, false);
-    setTimeout(initCountPolling, 3000);
+    setTimeout(initCountPolling, 5000);
   };
 
   if (window.addEventListener) {

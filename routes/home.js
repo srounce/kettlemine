@@ -1,3 +1,5 @@
+var config = require('../config');
+
 var routePrefix = "/";
 
 var routes = {
@@ -9,7 +11,7 @@ var routes = {
 
       res.render('index', {
         routePrefix : routePrefix,
-        title : 'iBrew',
+        title : config.strings.title,
         wantsTea : req.session.wantsTea
       });
     }
@@ -17,15 +19,19 @@ var routes = {
   choose : {
     post : function( req, res ) {
       var wantsTea = ( req.session.wantsTea || false)
+        , emailAdd = ( req.body.emailAdd || req.session.email || null)
         , teaCounter = res.app.locals.teaCounter;
 
-      if( wantsTea ) {
-        teaCounter.down();
-      } else {
-        teaCounter.up();
-      }
-
       wantsTea = req.session.wantsTea = !wantsTea;
+      req.session.email = emailAdd;
+
+      console.log(req.body);
+
+      if( wantsTea ) {
+        teaCounter.up();
+      } else {
+        teaCounter.down();
+      }
 
       if( req.xhr ) {
         res.send({

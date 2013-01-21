@@ -1,7 +1,9 @@
 var nodemailer = require('nodemailer')
-  , config = require('../config.js');
+  , config = require('../config.js')
+  , TeaRound = require('../lib/models/tearound');
 
 var routePrefix = "/arduino";
+
 var routes = {
   index : {
     all : function( req, res ) {
