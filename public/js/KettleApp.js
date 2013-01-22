@@ -59,7 +59,6 @@
     xhr(form.action, form.method, formData, evt_formXhr_complete);
   };
 
-
   evt_formXhr_complete = function( data )
   {
     var data = typeof this.response === "object" ? this.response : JSON.parse(this.response);

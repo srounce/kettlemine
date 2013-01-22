@@ -1,5 +1,6 @@
 var nodemailer = require('nodemailer')
   , config = require('../config.js')
+  , libutil = require('../lib/util')
   , TeaRound = require('../lib/models/tearound');
 
 var routePrefix = "/arduino";
@@ -10,29 +11,53 @@ var routes = {
       res.send('Hello arduino!');
     }
   }, 
-  ready : {
-    all : function( req, res ) {
+  round : {
+    post : function( req, res ) {
+      var teaCounter = res.app.locals.teaCounter;
+      var sessionStore = res.app.get('sessionStore');
       var smtpTransport = nodemailer.createTransport("SMTP", config.email);
 
-      smtpTransport.sendMail({
-        from : config.strings.title + ' <' + config.email.auth.user + '>',
-        to : config.strings.email.to,
-        subject : config.strings.email.subject,
-        text : config.strings.email.plaintext,
-        html : config.strings.email.html
-      }, function( err, mState ) {
-        if( err ) {
-          console.error(err)
-          res.send(0);
-        } else {
-          console.info(mState);
-          res.send(1);
+      var sids = Object.keys(sessionStore.sessions);
+
+      sids.forEach(function( sid ) {
+        var session = JSON.parse(sessionStore.sessions[ sid ]);
+console.log(session);
+        if( session.wantsTea ) {
+console.log('yeah');
+          smtpTransport.sendMail({
+            from : config.strings.title + ' <' + config.email.auth.user + '>',
+            to : session.email,
+            subject : config.strings.email.teaReady.subject,
+            text : config.strings.email.teaReady.plaintext,
+            html : config.strings.email.teaReady.html
+          }, function( err, mState ) {
+            if( err ) {
+              console.error(err)
+              res.send(0);
+            } else {
+              console.info(mState);
+              res.send(1);
+            }
+          });
+
+          session.wantsTea = false;
+
         }
+
       });
-    },
+
+      res.app.locals.teaCounter.reset();
+
+      res.end();
+    }
+  },
+  reset : {
+    post : function( req, res ) {
+
+    }
   },
   count : {
-    all : function( req, res ) {
+    get : function( req, res ) {
       var teaCounter = res.app.locals.teaCounter;
       res.send(teaCounter.toString());
     },
@@ -42,10 +67,9 @@ var routes = {
       var smtpTransport = nodemailer.createTransport("SMTP", config.email);
 
       var sids = Object.keys(sessionStore.sessions);
-console.log(sids.length);      
+
       sids.forEach(function( sid ) {
-        var session = JSON.parse(sessionStore.sessions[sid]);
-console.log(sids);
+        var session = JSON.parse(store.sessions[ sid ]);
         
         if( session.wantsTea && session.email && session.email !== false ) {
           smtpTransport.sendMail({
@@ -64,11 +88,10 @@ console.log(sids);
 
         session.wantsTea = false;
         sessionStore.sessions[sid] = JSON.stringify(session);
-
-        if( sid === sids[ sids.length -1 ] ) {
-          smtpTransport.close();
-        }
       }.bind(this));
+
+      smtpTransport.close();
+
       res.send( String(teaCounter.reset() ? 1 : 0) );
     }
   }
@@ -76,10 +99,24 @@ console.log(sids);
  
 exports.init = function( server ) 
 {
-  server.all(routePrefix, routes.index.all);
+  server.all(libutil.validUrl(routePrefix), routes.index.all);
   
-  server.all(routePrefix+"/ready", routes.ready.all);
+  server.post(libutil.validUrl(routePrefix, "/round"), routes.round.post);
+
+  server.post(libutil.validUrl(routePrefix, "/reset"), routes.reset.post);
   
-  server.del(routePrefix+"/count", routes.count.del);
-  server.all(routePrefix+"/count", routes.count.all);
+  server.del(libutil.validUrl(routePrefix, "/count"), routes.count.del);
+  server.all(libutil.validUrl(routePrefix, "/count"), routes.count.get);
 };
+
+function iterateSessions( store, iterFunc, who )
+{
+  var sids = Object.keys(store.sessions);
+  
+  sids.forEach(function( sid, key ) {
+    var session = JSON.parse(store.sessions[ sid ]);
+    
+    iterFunc(session, sid);
+
+  });
+}

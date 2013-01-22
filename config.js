@@ -18,11 +18,18 @@ exports.cookies = {
 };
 
 exports.strings = {
-  title : "Kettlemin"
+  title : "Kettle'in"
 };
 
 exports.strings.email = {
-  subject : "Fancy a cuppa?",
-  html : "<p>Yo!<br><br>I've got some tea on the way. Care for a mug?</p><form action=\"http://" + exports.server.hostname + (exports.server.port === 80) ? '' : (':' + exports.server.port) + "/choose\" method=\"POST\"><button type=\"submit\">Tea!</button></form><p>Lots of warm, sweet (slightly milky) love,<br><br><b>The Kettle</b>",
-  plaintext : ""
-}
+  newRound : {
+    subject : "Fancy a cuppa?",
+    html : "<p>Yo!<br><br>I've got some tea on the way. Care for a mug?</p><form action=\"http://" + exports.server.hostname + (exports.server.port === 80) ? '' : (':' + exports.server.port) + "/email/opt\" method=\"POST\"><button type=\"submit\">Tea!</button></form><p>Lots of warm, sweet, love,<br><br><b>The Kettle</b>",
+    plaintext : ""
+  },
+  teaReady : {
+    subject : "Ready when you are!",
+    html : "<p>Hey!</p><p>Your luvverly cuppa is ready and awaiting you sippage",
+    plaintext : ""
+  }
+};
