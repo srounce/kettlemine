@@ -8,7 +8,8 @@
     , evt_form_submit
     , evt_form_submit
     , tmpl_formSave
-    , browserijade = require('browserijade');
+    , browserijade = require('browserijade')
+    , libutil = require('../lib/util')
 
   xhr = function(url, method, data, success, error) 
   {
@@ -46,6 +47,7 @@
   evt_form_submit = function( ev )
   {
     var form = ev.target;
+    formData = (form.elements.length > 1) ? new FormData(form) : null;
 
     if( form.attributes.getNamedItem('disabled') ) {
       return;
@@ -54,14 +56,20 @@
     ev.preventDefault();
 
     form.setAttribute('disabled', '');
-    xhr(form.action, form.method, new FormData(form), evt_formXhr_complete);
+    xhr(form.action, form.method, formData, evt_formXhr_complete);
   };
 
 
   evt_formXhr_complete = function( data )
   {
     var data = typeof this.response === "object" ? this.response : JSON.parse(this.response);
-    var statusText = browserijade('partials/statusText', { wantsTea : data.wantsTea });
+    document.querySelector('form').innerHTML = browserijade('partials/teaform', {
+      routePrefix : '/' // < Naughty naughty!
+    , util : libutil
+    , wantsNotify : data.wantsNotify 
+    });
+
+    var statusText = browserijade('partials/statusText', { wantsNotify : data.wantsNotify });
     
     document.querySelector('.statusText').innerHTML = statusText;
     var el_cupCount = document.querySelector('.cupCount');
@@ -75,7 +83,7 @@
       element.textContent = parseInt(value);
       
       if(parseInt(value) === 0) {
-        var statusText = browserijade('partials/statusText', { wantsTea : false });
+        var statusText = browserijade('partials/statusText', { wantsNotify : false });
         
         document.querySelector('.statusText').innerHTML = statusText;
       }

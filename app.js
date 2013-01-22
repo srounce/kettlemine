@@ -12,7 +12,8 @@ var express = require('express')
   , browserify = require('browserify')
   , browserijade = require("browserijade")
   , config = require('./config')
-  , util = require('util');
+  , util = require('util')
+  , libutil = require('./lib/util')
 
 var app = express()
   , staticPath = path.join(__dirname, 'public')
@@ -51,6 +52,8 @@ app.configure(function(){
 app.configure('development', function(){
   app.use(express.errorHandler());
 });
+
+app.locals.util = libutil;
 
 // Routes
 routes(app);

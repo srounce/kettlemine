@@ -1,4 +1,5 @@
-var config = require('../config');
+var config = require('../config')
+  , libutil = require('../lib/util')
 
 var routePrefix = "/";
 
@@ -6,27 +7,27 @@ var routes = {
   index : {
     all : function( req, res ) {
       var teaCounter = 0
-        , wantsTea = req.session.wantsTea = (req.session.wantsTea || 0);
+        , wantsNotify = req.session.wantsNotify = (req.session.wantsNotify || 0);
 
       res.render('index', {
         routePrefix : routePrefix,
         title : config.strings.title,
-        wantsTea : req.session.wantsTea
+        wantsNotify : req.session.wantsNotify
       });
     }
   },
   choose : {
     post : function( req, res ) {
-      var wantsTea = ( req.session.wantsTea || false)
+      var wantsNotify = ( req.session.wantsNotify || false)
         , emailAdd = ( req.body.emailAdd || req.session.email || null)
         , teaCounter = res.app.locals.teaCounter;
 
-      wantsTea = req.session.wantsTea = !wantsTea;
+      wantsNotify = req.session.wantsNotify = !wantsNotify;
       req.session.email = emailAdd;
 
       console.log(req.body);
 
-      if( wantsTea ) {
+      if( wantsNotify ) {
         teaCounter.up();
       } else {
         teaCounter.down();
@@ -36,7 +37,7 @@ var routes = {
         res.send({
           success : true,
           count : Number(teaCounter),
-          wantsTea : wantsTea
+          wantsNotify : wantsNotify
         });
       } else {
         res.redirect(301, "/");
