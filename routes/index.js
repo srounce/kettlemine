@@ -9,6 +9,7 @@ module.exports = function(server) {
     'arduino'
   ];
 
+  server.locals.notifyCounter = new IncrementStore();
   server.locals.teaCounter = new IncrementStore();
  
   modules.forEach(function(module, index) {

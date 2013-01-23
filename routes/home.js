@@ -20,7 +20,7 @@ var routes = {
     post : function( req, res ) {
       var wantsNotify = ( req.session.wantsNotify || false )
         , emailAdd = ( req.body.emailAdd || req.session.email || null )
-        , teaCounter = res.app.locals.teaCounter;
+        , notifyCounter = res.app.locals.notifyCounter;
 
       wantsNotify = req.session.wantsNotify = !wantsNotify;
       req.session.email = emailAdd;
@@ -30,21 +30,21 @@ console.log(req.session);
       if( !( req.session.email && req.session.email.length > 0 ) ) {
         return res.send({
           success : false,
-          count : Number(teaCounter),
+          count : Number(notifyCounter),
           wantsNotify : wantsNotify
         });
       }
 
       if( wantsNotify ) {
-        teaCounter.up();
+        notifyCounter.up();
       } else {
-        teaCounter.down();
+        notifyCounter.down();
       }
 
       if( req.xhr ) {
         res.send({
           success : true,
-          count : Number(teaCounter),
+          count : Number(notifyCounter),
           wantsNotify : wantsNotify
         });
       } else {

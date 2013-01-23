@@ -75,9 +75,9 @@ console.log('yeah');
           smtpTransport.sendMail({
             from : config.strings.title + ' <' + config.email.auth.user + '>',
             to : session.email,
-            subject : "Tea's ready!",
-            text : "Plaintext message goes here",
-            html : "<b>HTML</b> message <em>goes</em> here!"
+            subject : config.strings.email.newround.subject,
+            html : config.strings.email.newround.html,
+            text : config.strings.email.newround.plaintext
           }, function( err, res ) {
             if( err ) 
               console.error(err)
